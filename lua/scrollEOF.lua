@@ -4,7 +4,7 @@ local mode_disabled = false
 local relative_scrolloff = 0
 
 -- Lookup tables built from the `disabled_*` option lists in `setup()`
-local disabled = { filetypes = {}, modes = {} }
+local disabled = { filetypes = {}, buftypes = {}, modes = {} }
 
 local function to_set(list)
   local set = {}
@@ -27,7 +27,9 @@ local function is_disabled()
     end
   end
 
-  return mode_disabled or disabled.filetypes[vim.o.filetype] == true
+  return mode_disabled
+    or disabled.filetypes[vim.o.filetype] == true
+    or disabled.buftypes[vim.bo.buftype] == true
 end
 
 local function check_eof_scrolloff(ev)
@@ -70,6 +72,7 @@ local default_opts = {
   insert_mode = false,
   floating = true,
   disabled_filetypes = { 'terminal' },
+  disabled_buftypes = { 'prompt' },
   disabled_modes = { 't', 'nt' },
   relative_scrolloff = 0,
   enabled = true,
@@ -112,6 +115,7 @@ function M.setup(opts)
   M.opts = vim.tbl_extend('force', {}, default_opts, opts or {})
 
   disabled.filetypes = to_set(M.opts.disabled_filetypes)
+  disabled.buftypes = to_set(M.opts.disabled_buftypes)
   disabled.modes = to_set(M.opts.disabled_modes)
 
   local autocmds = { 'CursorMoved', 'WinScrolled', "WinNew", }

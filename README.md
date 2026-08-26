@@ -59,6 +59,8 @@ require('scrollEOF').setup({
   floating = true,
   -- List of filetypes to disable scrollEOF for.
   disabled_filetypes = { 'terminal' },
+  -- List of buftypes to disable scrollEOF for. see https://neovim.io/doc/user/options.html#'buftype'
+  disabled_buftypes = { 'prompt' },
   -- List of modes to disable scrollEOF for. see https://neovim.io/doc/user/builtin.html#mode()
   disabled_modes = { 't', 'nt' },
   -- If set to a number > 1, scrolloff is calculated as floor(window_height / n)
