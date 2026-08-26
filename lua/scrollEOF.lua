@@ -4,7 +4,7 @@ local mode_disabled = false
 local relative_scrolloff = 0
 
 local function is_disabled()
-  return mode_disabled or M.opts.disabled_filetypes[vim.o.filetype] == true
+  return mode_disabled or M.opts.disabled_filetypes[vim.o.filetype] == true or M.opts.disabled_buftype[vim.bo.buftype] == true
 end
 
 local function check_eof_scrolloff(ev)
@@ -49,6 +49,7 @@ local default_opts = {
   disabled_filetypes = { 'terminal' },
   disabled_modes = { 't', 'nt' },
   relative_scrolloff = 0,
+  disabled_buftype = { 'prompt' },
 }
 
 local function vim_resized_cb(ev)
@@ -111,6 +112,12 @@ function M.setup(opts)
   if M.opts.insert_mode then
     table.insert(autocmds, 'CursorMovedI')
   end
+
+  local disabled_buftype_hashmap = {}
+  for _, val in pairs(M.opts.disabled_buftype) do
+    disabled_buftype_hashmap[val] = true
+  end
+  M.opts.disabled_buftype = disabled_buftype_hashmap
 
   relative_scrolloff = M.opts.relative_scrolloff
 
