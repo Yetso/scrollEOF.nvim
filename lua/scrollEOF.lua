@@ -34,11 +34,12 @@ local function check_eof_scrolloff(ev)
   local scrolloff = vim.wo[win_id].scrolloff
 
   if visual_distance_to_eof < scrolloff then
+    local diff = scrolloff - visual_distance_to_eof
     local win_view = vim.fn.winsaveview()
-    vim.fn.winrestview({
-      skipcol = 0, -- Without this, `gg` `G` can cause the cursor position to be shown incorrectly
-      topline = win_view.topline + scrolloff - visual_distance_to_eof,
-    })
+    if win_view.skipcol ~= 0 then
+      vim.fn.winrestview({ skipcol = 0 })
+    end
+    vim.cmd('execute "keepjumps normal! ' .. diff .. '\\<C-e>"')
   end
 end
 
