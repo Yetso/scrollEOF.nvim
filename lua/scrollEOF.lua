@@ -59,11 +59,13 @@ local function check_eof_scrolloff(ev)
   local scrolloff = vim.wo[win_id].scrolloff
 
   if visual_distance_to_eof < scrolloff then
-    local win_view = vim.fn.winsaveview()
-    vim.fn.winrestview({
-      skipcol = 0, -- Without this, `gg` `G` can cause the cursor position to be shown incorrectly
-      topline = win_view.topline + scrolloff - visual_distance_to_eof,
-    })
+    -- Without this, `gg` `G` can cause the cursor position to be shown incorrectly
+    if vim.fn.winsaveview().skipcol ~= 0 then
+      vim.fn.winrestview({ skipcol = 0 })
+    end
+    -- Scroll by screen lines (unlike adding to `topline`), so closed folds count as one line
+    local ctrl_e = vim.api.nvim_replace_termcodes('<C-e>', true, false, true)
+    vim.cmd('normal! ' .. (scrolloff - visual_distance_to_eof) .. ctrl_e)
   end
 end
 
