@@ -46,6 +46,10 @@ These are the default settings. Any changes can be made in the call to `setup`.
 ```lua
 -- Default settings
 require('scrollEOF').setup({
+  -- Whether the plugin is enabled. Can be a boolean or a function that returns a boolean.
+  -- When a function is provided, it will be called on every relevant event to determine
+  -- if the plugin should run.
+  enabled = true,
   -- The pattern used for the internal autocmd to determine
   -- where to run scrollEOF. See https://neovim.io/doc/user/autocmd.html#autocmd-pattern
   pattern = '*',
@@ -61,10 +65,6 @@ require('scrollEOF').setup({
   -- and dynamically updated whenever the window changes.
   -- This ignores your existing global scrolloff value.
   relative_scrolloff = 0,
-  -- Whether the plugin is enabled. Can be a boolean or a function that returns a boolean.
-  -- When a function is provided, it will be called on every relevant event to determine
-  -- if the plugin should run.
-  enabled = true,
 })
 ```
 
