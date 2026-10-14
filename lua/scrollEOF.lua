@@ -4,6 +4,18 @@ local mode_disabled = false
 local relative_scrolloff = 0
 
 local function is_disabled()
+  -- Check if plugin is globally disabled via the `enabled` option
+  if M.opts.enabled ~= nil then
+    local enabled = M.opts.enabled
+    if type(enabled) == 'function' then
+      enabled = enabled()
+    end
+
+    if not enabled then
+      return true
+    end
+  end
+
   return mode_disabled or M.opts.disabled_filetypes[vim.o.filetype] == true
 end
 
@@ -49,6 +61,7 @@ local default_opts = {
   disabled_filetypes = { 'terminal' },
   disabled_modes = { 't', 'nt' },
   relative_scrolloff = 0,
+  enabled = true,
 }
 
 local function vim_resized_cb(ev)

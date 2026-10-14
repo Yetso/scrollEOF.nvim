@@ -61,6 +61,10 @@ require('scrollEOF').setup({
   -- and dynamically updated whenever the window changes.
   -- This ignores your existing global scrolloff value.
   relative_scrolloff = 0,
+  -- Whether the plugin is enabled. Can be a boolean or a function that returns a boolean.
+  -- When a function is provided, it will be called on every relevant event to determine
+  -- if the plugin should run.
+  enabled = true,
 })
 ```
 
