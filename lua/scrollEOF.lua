@@ -3,6 +3,17 @@ local M = {}
 local mode_disabled = false
 local relative_scrolloff = 0
 
+-- Lookup tables built from the `disabled_*` option lists in `setup()`
+local disabled = { filetypes = {}, modes = {} }
+
+local function to_set(list)
+  local set = {}
+  for _, val in pairs(list) do
+    set[val] = true
+  end
+  return set
+end
+
 local function is_disabled()
   -- Check if plugin is globally disabled via the `enabled` option
   if M.opts.enabled ~= nil then
@@ -16,7 +27,7 @@ local function is_disabled()
     end
   end
 
-  return mode_disabled or M.opts.disabled_filetypes[vim.o.filetype] == true
+  return mode_disabled or disabled.filetypes[vim.o.filetype] == true
 end
 
 local function check_eof_scrolloff(ev)
@@ -96,29 +107,12 @@ local function vim_resized_cb(ev)
 end
 
 function M.setup(opts)
-  if opts == nil then
-    opts = default_opts
-  else
-    for key, value in pairs(default_opts) do
-      if opts[key] == nil then
-        opts[key] = value
-      end
-    end
-  end
+  -- Build a new table instead of modifying `opts` or `default_opts`, so that
+  -- calling `setup()` again (e.g. when reloading the config) works.
+  M.opts = vim.tbl_extend('force', {}, default_opts, opts or {})
 
-  M.opts = opts
-
-  local disabled_filetypes_hashmap = {}
-  for _, val in pairs(M.opts.disabled_filetypes) do
-    disabled_filetypes_hashmap[val] = true
-  end
-  M.opts.disabled_filetypes = disabled_filetypes_hashmap
-
-  local disabled_modes_hashmap = {}
-  for _, val in pairs(M.opts.disabled_modes) do
-    disabled_modes_hashmap[val] = true
-  end
-  M.opts.disabled_modes = disabled_modes_hashmap
+  disabled.filetypes = to_set(M.opts.disabled_filetypes)
+  disabled.modes = to_set(M.opts.disabled_modes)
 
   local autocmds = { 'CursorMoved', 'WinScrolled', "WinNew", }
   if M.opts.insert_mode then
@@ -133,7 +127,7 @@ function M.setup(opts)
     group = scrollEOF_group,
     pattern = M.opts.pattern,
     callback = function()
-      mode_disabled = M.opts.disabled_modes[vim.api.nvim_get_mode().mode] == true
+      mode_disabled = disabled.modes[vim.api.nvim_get_mode().mode] == true
     end,
   })
 
